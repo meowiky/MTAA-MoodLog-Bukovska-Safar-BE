@@ -71,3 +71,37 @@ curl --location --request PATCH 'http://localhost:8000/api/entries/1/modify/' \
     "title": "Updated Title for PATCH"
 }'
 ```
+
+
+
+```
+curl --location --request POST 'http://localhost:8000/api/friendrequest/1/2/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data '{
+}'
+```
+
+```
+curl --location --request PATCH 'http://localhost:8000/api/friendaccept/1/2/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data '{
+}'
+```
+
+```
+curl --location --request PATCH 'http://localhost:8000/api/frienddecline/1/2/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data '{
+}'
+```
+
+```
+curl --location --request GET 'http://localhost:8000/api/friends/1/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data '{
+}'
+```

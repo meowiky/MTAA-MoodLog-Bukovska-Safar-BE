@@ -1,9 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import User, DiaryEntryTag
-from .models import DiaryEntry
-from .models import Tag
-from .models import DiaryEntryPhoto
+from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -59,4 +56,29 @@ class DiaryEntryPhotoSerializer(serializers.ModelSerializer):
         model = DiaryEntryPhoto
         fields = '__all__'
 
+
+class FriendshipRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friendship
+        fields = '__all__'
+
+
+class FriendshipModifySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friendship
+        fields = ['status']       
+
+
+class FriendsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['name', 'email']
+    name = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        return obj[0]
+
+    def get_email(self, obj):
+        return obj[1]
 

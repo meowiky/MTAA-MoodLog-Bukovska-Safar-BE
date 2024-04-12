@@ -75,14 +75,14 @@ class DiaryEntryPhoto(models.Model):
 
 class FriendshipStatus(models.TextChoices):
     ACCEPTED = 'ACC', 'Accepted'
-    REQUESTED = 'REQ', 'Requested'
+    PENDING = 'PEN', 'Pending'
     DECLINED = 'DEC', 'Declined'
-
+    
 class Friendship(models.Model):
     user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendship_user1')
     user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendship_user2')
-    status_enum_user1 = models.CharField(max_length=3, choices=FriendshipStatus.choices)
-    status_enum_user2 = models.CharField(max_length=3, choices=FriendshipStatus.choices)
+    status = models.CharField(max_length=3, choices=FriendshipStatus.choices, default='PEN')
+    sender = models.IntegerField(choices=[(1, 'User1'), (2, 'User2')], default=1)
 
 class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='message_sender')

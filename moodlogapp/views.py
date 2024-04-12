@@ -1,18 +1,13 @@
 from django.contrib.auth import authenticate
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .models import User, DiaryEntryTag
-from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer
+from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
-from .models import DiaryEntry
-from .serializers import DiaryEntrySerializer
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
 from rest_framework import status
-from .models import Tag
-from .serializers import TagSerializer
-from .models import DiaryEntryPhoto
-from .serializers import DiaryEntryPhotoSerializer
+
+from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship
+from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer, TagSerializer, DiaryEntryPhotoSerializer
+from .serializers import DiaryEntrySerializer, FriendshipRequestSerializer, FriendshipModifySerializer, FriendsSerializer
 
 @api_view(['POST'])
 def register(request):
@@ -102,4 +97,74 @@ def add_tag(request, entry_id):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def sendfriendrequest(request, user_id, friend_id):
+    sender=1
+    if user_id>friend_id:
+        user_id, friend_id = friend_id, user_id
+        sender=2
 
+    request.data['user1'] = user_id
+    request.data['user2'] = friend_id
+    request.data['sender'] = sender
+
+    friendship=Friendship.objects.filter(Q(status='PEN') | Q(status='ACC'), user1=user_id, user2=friend_id).first()
+    if friendship:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    serializer=FriendshipRequestSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def acceptfriendrequest(request, user_id, friend_id):
+    sender=2
+    if user_id>friend_id:
+        user_id, friend_id = friend_id, user_id
+        sender=1
+
+    request.data['status']='ACC'
+    friendship=Friendship.objects.filter(user1=user_id, user2=friend_id, status='PEN', sender=sender).first()
+    print("user1:", user_id, "user2:", friend_id, "sender:", sender, friendship)
+    if not friendship:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    serializer=FriendshipModifySerializer(friendship, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def declinefriendrequest(request, user_id, friend_id):
+    if user_id>friend_id:
+        user_id, friend_id = friend_id, user_id
+
+    request.data['status']='DEC'
+    friendship=Friendship.objects.filter(user1=user_id, user2=friend_id).exclude(status='DEC').first()
+    if not friendship:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    serializer=FriendshipModifySerializer(friendship, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getallfriends(request, user_id):
+    friends1=Friendship.objects.filter(user1=user_id, status='ACC').select_related("user2").values_list("user2__name", "user2__email").distinct()
+    friends2=Friendship.objects.filter(user2=user_id, status='ACC').select_related("user1").values_list("user1__name", "user1__email").distinct()
+    friends=friends1.union(friends2)
+
+    print(friends)
+    serializer=FriendsSerializer(friends, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
