@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship
+from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship, Message
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -82,3 +82,20 @@ class FriendsSerializer(serializers.ModelSerializer):
     def get_email(self, obj):
         return obj[1]
 
+
+class SendMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = '__all__'
+
+
+class GetMessagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['text', 'sent_at', 'read_at', 'sender', 'receiver']
+
+
+class ChangeNotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['notification']

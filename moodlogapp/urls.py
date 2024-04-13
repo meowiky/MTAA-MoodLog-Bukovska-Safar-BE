@@ -15,4 +15,7 @@ urlpatterns = [
     path('change_name/', views.change_name, name='change_name'),
     path('change_email/', views.change_email, name='change_email'),
     path('change_password/', views.change_password, name='change_password'),
+    path('send_message/<int:friend_id>/', views.send_message, name='send_message'),
+    path('get_messages/<int:friend_id>/', views.get_messages, name='get_messages'),
+    path('change_notifications/', views.change_notifications, name='change_notifications'),
 ]

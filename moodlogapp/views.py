@@ -5,10 +5,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
-from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship
+from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship, Message
 from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer, TagSerializer, DiaryEntryPhotoSerializer
 from .serializers import DiaryEntrySerializer, FriendshipRequestSerializer, FriendshipModifySerializer, FriendsSerializer
+from .serializers import SendMessageSerializer, GetMessagesSerializer, ChangeNotificationSerializer
 
 @api_view(['POST'])
 def register(request):
@@ -202,3 +204,50 @@ def change_password(request):
         return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
     return Response({'error': 'Old password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_message(request, friend_id):
+    user=request.user
+    friend=get_object_or_404(User, pk=friend_id)
+    request.data['sender']=user.id
+    request.data['receiver']=friend.id
+    serializer = SendMessageSerializer(data = request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_messages(request, friend_id):
+    user=request.user
+    friend=get_object_or_404(User, pk=friend_id)
+    
+    messages = Message.objects.filter(Q(sender=user, receiver=friend) | Q(sender=friend, receiver=user))
+    messages_to_update = messages.filter(sender=friend, read_at=None)
+    if messages_to_update:
+        messages_to_update.update(read_at=timezone.now())
+    serializer = GetMessagesSerializer(messages, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def change_notifications(request):
+    user=request.user
+
+    notification=user.notification
+    if notification:
+        notification=False
+    else:
+        notification=True
+    
+    serializer = ChangeNotificationSerializer(user, data={'notification': notification}, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
