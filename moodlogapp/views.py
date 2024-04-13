@@ -385,6 +385,21 @@ def get_messages(request, friend_id):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_message(request, message_id):
+    user=request.user
+    try:
+        message = Message.objects.get(id=message_id)
+    except Message.DoesNotExist:
+        return Response({'message': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if message.sender!=user:
+        return Response({'error': 'You are not authorized to delete this message'}, status=status.HTTP_401_UNAUTHORIZED)
+    message.delete()
+    return Response({'message': 'Message deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def change_notifications(request):

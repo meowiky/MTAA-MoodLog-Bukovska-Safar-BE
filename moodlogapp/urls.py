@@ -24,6 +24,7 @@ urlpatterns = [
     path('entries/ordered/', get_diary_entries_ordered, name='get_diary_entries_ordered'),
     path('send_message/<int:friend_id>/', views.send_message, name='send_message'),
     path('get_messages/<int:friend_id>/', views.get_messages, name='get_messages'),
+    path('delete_message/<int:message_id>/', views.delete_message, name='delete_message'),
     path('change_notifications/', views.change_notifications, name='change_notifications'),
     path('entries/<int:entry_id>/remove_tag/<int:tag_id>/', remove_tag_from_entry, name='remove_tag_from_entry'),
     path('entries/<int:entry_id>/delete/', delete_diary_entry, name='delete_diary_entry'),
