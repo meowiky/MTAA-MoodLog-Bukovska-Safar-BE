@@ -300,4 +300,13 @@ def get_yearly_emotion_stats(request):
 
     return Response(stats)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_diary_entries_ordered(request):
+    diary_entries = DiaryEntry.objects.filter(user=request.user).order_by('-date')
+
+    serializer = DiaryEntrySerializer(diary_entries, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 

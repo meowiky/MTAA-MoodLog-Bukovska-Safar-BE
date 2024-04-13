@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
-from .views import get_weekly_emotion_stats, get_monthly_emotion_stats, get_yearly_emotion_stats
+from .views import get_weekly_emotion_stats, get_monthly_emotion_stats, get_yearly_emotion_stats, \
+    get_diary_entries_ordered
 
 urlpatterns = [
     path('register/', views.register, name='register'),
@@ -20,4 +21,5 @@ urlpatterns = [
     path('stats/emotions/weekly/', get_weekly_emotion_stats, name='weekly-emotion-stats'),
     path('stats/emotions/monthly/', get_monthly_emotion_stats, name='monthly-emotion-stats'),
     path('stats/emotions/yearly/', get_yearly_emotion_stats, name='yearly-emotion-stats'),
+    path('entries/ordered/', get_diary_entries_ordered, name='get_diary_entries_ordered'),
 ]
