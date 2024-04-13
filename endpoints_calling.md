@@ -95,3 +95,31 @@ curl --location 'http://localhost:8000/api/friends/' \
 --header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
 --header 'Content-Type: application/json'
 ```
+
+```
+curl --location --request PATCH 'http://localhost:8000/api/change_name/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "New Name user1"
+}'
+```
+
+```
+curl --location --request PATCH 'http://localhost:8000/api/change_email/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "newemail@example.com"
+}'
+```
+
+```
+curl --location --request PATCH 'http://localhost:8000/api/change_password/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "old_password": "securepassword123",
+    "new_password": "newpassword123"
+}'
+```
