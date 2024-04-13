@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 
 from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship
 from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer, TagSerializer, DiaryEntryPhotoSerializer
@@ -99,72 +100,65 @@ def add_tag(request, entry_id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def sendfriendrequest(request, user_id, friend_id):
-    sender=1
-    if user_id>friend_id:
-        user_id, friend_id = friend_id, user_id
-        sender=2
+def send_friend_request(request, friend_id):
+    user = request.user
+    friend = get_object_or_404(User, pk=friend_id)
 
-    request.data['user1'] = user_id
-    request.data['user2'] = friend_id
-    request.data['sender'] = sender
+    if user.id > friend_id:
+        user, friend = friend, user
 
-    friendship=Friendship.objects.filter(Q(status='PEN') | Q(status='ACC'), user1=user_id, user2=friend_id).first()
-    if friendship:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-    serializer=FriendshipRequestSerializer(data=request.data)
+    friendship_exists = Friendship.objects.filter(
+        (Q(status='PEN') | Q(status='ACC')), user1=user, user2=friend
+    ).exists()
+    if friendship_exists:
+        return Response({'error': 'Friend request already sent or connection exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    data = {'user1': user.id, 'user2': friend.id, 'status': 'PEN'}
+    serializer = FriendshipRequestSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
-def acceptfriendrequest(request, user_id, friend_id):
-    sender=2
-    if user_id>friend_id:
-        user_id, friend_id = friend_id, user_id
-        sender=1
+def accept_friend_request(request, friend_id):
+    user = request.user
+    friend = get_object_or_404(User, pk=friend_id)
 
-    request.data['status']='ACC'
-    friendship=Friendship.objects.filter(user1=user_id, user2=friend_id, status='PEN', sender=sender).first()
-    print("user1:", user_id, "user2:", friend_id, "sender:", sender, friendship)
-    if not friendship:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    serializer=FriendshipModifySerializer(friendship, data=request.data, partial=True)
+    if user.id > friend_id:
+        user, friend = friend, user
+
+    friendship = get_object_or_404(Friendship, user1=user, user2=friend, status='PEN')
+    serializer = FriendshipModifySerializer(friendship, data={'status': 'ACC'}, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
-def declinefriendrequest(request, user_id, friend_id):
-    if user_id>friend_id:
-        user_id, friend_id = friend_id, user_id
+def decline_friend_request(request, friend_id):
+    user = request.user
+    friend = get_object_or_404(User, pk=friend_id)
 
-    request.data['status']='DEC'
-    friendship=Friendship.objects.filter(user1=user_id, user2=friend_id).exclude(status='DEC').first()
-    if not friendship:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    serializer=FriendshipModifySerializer(friendship, data=request.data, partial=True)
+    if user.id > friend_id:
+        user, friend = friend, user
+
+    friendship = get_object_or_404(Friendship, user1=user, user2=friend)
+    serializer = FriendshipModifySerializer(friendship, data={'status': 'DEC'}, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def getallfriends(request, user_id):
-    friends1=Friendship.objects.filter(user1=user_id, status='ACC').select_related("user2").values_list("user2__name", "user2__email").distinct()
-    friends2=Friendship.objects.filter(user2=user_id, status='ACC').select_related("user1").values_list("user1__name", "user1__email").distinct()
-    friends=friends1.union(friends2)
+def get_all_friends(request):
+    user = request.user
+    friends1 = Friendship.objects.filter(user1=user, status='ACC').select_related("user2").values_list("user2__name", "user2__email").distinct()
+    friends2 = Friendship.objects.filter(user2=user, status='ACC').select_related("user1").values_list("user1__name", "user1__email").distinct()
+    friends = friends1.union(friends2)
 
-    print(friends)
-    serializer=FriendsSerializer(friends, many=True)
+    serializer = FriendsSerializer(friends, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

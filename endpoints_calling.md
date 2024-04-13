@@ -72,36 +72,26 @@ curl --location --request PATCH 'http://localhost:8000/api/entries/1/modify/' \
 }'
 ```
 
-
-
 ```
-curl --location --request POST 'http://localhost:8000/api/friendrequest/1/2/' \
+curl --location --request POST 'http://localhost:8000/api/friend_requests/send/2/' \
 --header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
---header 'Content-Type: application/json' \
---data '{
-}'
+--header 'Content-Type: application/json'
 ```
 
 ```
-curl --location --request PATCH 'http://localhost:8000/api/friendaccept/1/2/' \
---header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
---header 'Content-Type: application/json' \
---data '{
-}'
+curl --location --request PATCH 'http://localhost:8000/api/friend_requests/accept/1/' \
+--header 'Authorization: Token e228f210f88cae74af9691796df48be6aa559936' \
+--header 'Content-Type: application/json'
 ```
 
 ```
-curl --location --request PATCH 'http://localhost:8000/api/frienddecline/1/2/' \
---header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
---header 'Content-Type: application/json' \
---data '{
-}'
+curl --location --request PATCH 'http://localhost:8000/api/friend_requests/decline/1/' \
+--header 'Authorization: Token 7eb396394b14f0ac7c3aef66a1ea0acecb936179' \
+--header 'Content-Type: application/json'
 ```
 
 ```
-curl --location --request GET 'http://localhost:8000/api/friends/1/' \
+curl --location 'http://localhost:8000/api/friends/' \
 --header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
---header 'Content-Type: application/json' \
---data '{
-}'
+--header 'Content-Type: application/json'
 ```

@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from .views import create_tag
 
 urlpatterns = [
     path('register/', views.register, name='register'),
@@ -8,9 +7,9 @@ urlpatterns = [
     path('entries/create/', views.create_diary_entry, name='create_diary_entry'),
     path('entries/<int:entry_id>/modify/', views.modify_diary_entry, name='modify_diary_entry'),
     path('entries/<int:entry_id>/add_tag/', views.add_tag, name='add_tag'),
-    path('tags/create/', create_tag, name='create_tag'),
-    path('friendrequest/<int:user_id>/<int:friend_id>/', views.sendfriendrequest, name='send_request'),
-    path('friendaccept/<int:user_id>/<int:friend_id>/', views.acceptfriendrequest, name='accept_request'),
-    path('frienddecline/<int:user_id>/<int:friend_id>/', views.declinefriendrequest, name='decline_request'),
-    path('friends/<int:user_id>/', views.getallfriends, name='get_friends'),
+    path('tags/create/', views.create_tag, name='create_tag'),
+    path('friend_requests/send/<int:friend_id>/', views.send_friend_request, name='send_request'),
+    path('friend_requests/accept/<int:friend_id>/', views.accept_friend_request, name='accept_request'),
+    path('friend_requests/decline/<int:friend_id>/', views.decline_friend_request, name='decline_request'),
+    path('friends/', views.get_all_friends, name='get_friends'),
 ]
