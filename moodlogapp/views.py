@@ -202,3 +202,11 @@ def change_password(request):
         return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
     return Response({'error': 'Old password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_user_tags(request):
+    tags = Tag.objects.filter(user=request.user).order_by('tagname')
+    serializer = TagSerializer(tags, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+

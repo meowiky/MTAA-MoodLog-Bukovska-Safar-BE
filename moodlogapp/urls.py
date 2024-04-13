@@ -15,4 +15,5 @@ urlpatterns = [
     path('change_name/', views.change_name, name='change_name'),
     path('change_email/', views.change_email, name='change_email'),
     path('change_password/', views.change_password, name='change_password'),
+    path('tags/', views.list_user_tags, name='list_user_tags'),
 ]
