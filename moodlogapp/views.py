@@ -67,6 +67,18 @@ def modify_diary_entry(request, entry_id):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_diary_entry(request, entry_id):
+    try:
+        diary_entry = DiaryEntry.objects.get(id=entry_id, user=request.user)
+    except DiaryEntry.DoesNotExist:
+        return Response({'message': 'DiaryEntry not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    diary_entry.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_tag(request):
