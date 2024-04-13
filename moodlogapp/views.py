@@ -9,6 +9,8 @@ from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from django.db.models.functions import TruncDay
 import calendar
+from rest_framework.parsers import FileUploadParser
+from rest_framework.decorators import parser_classes
 
 from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship, Message
 from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer, TagSerializer, DiaryEntryPhotoSerializer
@@ -416,3 +418,20 @@ def change_notifications(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@parser_classes([FileUploadParser])
+def add_photo_to_entry(request, entry_id):
+    try:
+        diary_entry = DiaryEntry.objects.get(id=entry_id, user=request.user)
+    except DiaryEntry.DoesNotExist:
+        return Response({'message': 'DiaryEntry not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    file_serializer = DiaryEntryPhotoSerializer(data=request.data)
+
+    if file_serializer.is_valid():
+        file_serializer.save(diaryentry=diary_entry)
+        return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

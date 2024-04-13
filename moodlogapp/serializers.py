@@ -54,7 +54,11 @@ class DiaryEntryTagSerializer(serializers.ModelSerializer):
 class DiaryEntryPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiaryEntryPhoto
-        fields = '__all__'
+        fields = ('photo', 'diaryentry')
+
+    def create(self, validated_data):
+        photo_instance = DiaryEntryPhoto.objects.create(**validated_data)
+        return photo_instance
 
 
 class FriendshipRequestSerializer(serializers.ModelSerializer):

@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from .views import get_weekly_emotion_stats, get_monthly_emotion_stats, get_yearly_emotion_stats, \
-    get_diary_entries_ordered, remove_tag_from_entry, delete_diary_entry
+    get_diary_entries_ordered, remove_tag_from_entry, delete_diary_entry, add_photo_to_entry
 
 urlpatterns = [
     path('register/', views.register, name='register'),
@@ -28,4 +28,5 @@ urlpatterns = [
     path('change_notifications/', views.change_notifications, name='change_notifications'),
     path('entries/<int:entry_id>/remove_tag/<int:tag_id>/', remove_tag_from_entry, name='remove_tag_from_entry'),
     path('entries/<int:entry_id>/delete/', delete_diary_entry, name='delete_diary_entry'),
+    path('entries/<int:entry_id>/add_photo/', add_photo_to_entry, name='add_photo_to_entry'),
 ]
