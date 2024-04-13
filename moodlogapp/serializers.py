@@ -83,6 +83,11 @@ class FriendsSerializer(serializers.ModelSerializer):
         return obj[1]
 
 
+class EmotionStatsSerializer(serializers.Serializer):
+    emotion = serializers.CharField(max_length=2)
+    count = serializers.IntegerField()
+
+
 class SendMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message

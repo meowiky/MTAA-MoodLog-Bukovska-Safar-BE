@@ -1,16 +1,19 @@
 from django.contrib.auth import authenticate
-from django.db.models import Q
+from django.db.models import Q, Count
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+from django.db.models.functions import TruncDay
+import calendar
 
 from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship, Message
 from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer, TagSerializer, DiaryEntryPhotoSerializer
 from .serializers import DiaryEntrySerializer, FriendshipRequestSerializer, FriendshipModifySerializer, FriendsSerializer
-from .serializers import SendMessageSerializer, GetMessagesSerializer, ChangeNotificationSerializer
+from .serializers import SendMessageSerializer, GetMessagesSerializer, ChangeNotificationSerializer, EmotionStatsSerializer
 
 @api_view(['POST'])
 def register(request):
@@ -122,6 +125,7 @@ def send_friend_request(request, friend_id):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def accept_friend_request(request, friend_id):
@@ -155,6 +159,7 @@ def decline_friend_request(request, friend_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_friends(request):
@@ -166,6 +171,7 @@ def get_all_friends(request):
     serializer = FriendsSerializer(friends, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def change_name(request):
@@ -176,6 +182,7 @@ def change_name(request):
         user.save()
         return Response({'message': 'Name updated successfully.'}, status=status.HTTP_200_OK)
     return Response({'error': 'Invalid request, name is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
@@ -190,6 +197,7 @@ def change_email(request):
         return Response({'message': 'Email updated successfully.'}, status=status.HTTP_200_OK)
     return Response({'error': 'Invalid request, email is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def change_password(request):
@@ -203,6 +211,112 @@ def change_password(request):
         user.save()
         return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
     return Response({'error': 'Old password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_user_tags(request):
+    tags = Tag.objects.filter(user=request.user).order_by('tagname')
+    serializer = TagSerializer(tags, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_weekly_emotion_stats(request):
+    today = timezone.now().date()
+    a_week_ago = today - timezone.timedelta(days=7)
+
+    weekly_entries = DiaryEntry.objects.filter(
+        user=request.user,
+        date__range=[a_week_ago, today]
+    )
+
+    emotion_stats = weekly_entries.values('emotion').annotate(count=Count('emotion'))
+
+    serializer = EmotionStatsSerializer(emotion_stats, many=True)
+
+    number_of_days = weekly_entries.annotate(day=TruncDay('date')).values('day').distinct().count()
+
+    stats = {
+        'emotion_stats': serializer.data,
+        'number_of_days_with_entry': number_of_days,
+        'number_of_days': 7
+    }
+
+    return Response(stats)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_monthly_emotion_stats(request):
+    today = timezone.now().date()
+    a_month_ago = today - relativedelta(months=1)
+
+    monthly_entries = DiaryEntry.objects.filter(
+        user=request.user,
+        date__range=[a_month_ago, today]
+    )
+
+    emotion_stats = monthly_entries.annotate(day=TruncDay('date'))\
+                                   .values('day', 'emotion')\
+                                   .annotate(count=Count('emotion'))\
+                                   .order_by('day', 'emotion')
+
+    _, total_days_in_month = calendar.monthrange(today.year, today.month)
+
+    number_of_days = monthly_entries.annotate(day=TruncDay('date')).values('day').distinct().count()
+
+    serializer = EmotionStatsSerializer(emotion_stats, many=True)
+
+    stats = {
+        'emotion_stats': serializer.data,
+        'number_of_days_with_entry': number_of_days,
+        'number_of_days': total_days_in_month
+    }
+
+    return Response(stats)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_yearly_emotion_stats(request):
+    today = timezone.now().date()
+    a_year_ago = today - relativedelta(years=1)
+
+    yearly_entries = DiaryEntry.objects.filter(
+        user=request.user,
+        date__range=[a_year_ago, today]
+    )
+
+    emotion_stats = yearly_entries.annotate(day=TruncDay('date'))\
+                                  .values('day', 'emotion')\
+                                  .annotate(count=Count('emotion'))\
+                                  .order_by('day', 'emotion')
+
+    number_of_days = yearly_entries.annotate(day=TruncDay('date')).values('day').distinct().count()
+
+    serializer = EmotionStatsSerializer(emotion_stats, many=True)
+
+    total_days_in_year = 365 + calendar.isleap(today.year)
+
+    stats = {
+        'emotion_stats': serializer.data,
+        'number_of_days_with_entry': number_of_days,
+        'number_of_days': total_days_in_year
+    }
+
+    return Response(stats)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_diary_entries_ordered(request):
+    diary_entries = DiaryEntry.objects.filter(user=request.user).order_by('-date')
+
+    serializer = DiaryEntrySerializer(diary_entries, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -231,7 +345,6 @@ def get_messages(request, friend_id):
     if messages_to_update:
         messages_to_update.update(read_at=timezone.now())
     serializer = GetMessagesSerializer(messages, many=True)
-
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
