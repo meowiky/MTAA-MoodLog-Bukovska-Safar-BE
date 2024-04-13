@@ -102,6 +102,31 @@ def add_tag(request, entry_id):
     serializer = DiaryEntryTagSerializer(diary_entry_tag)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_tag_from_entry(request, entry_id, tag_id):
+    try:
+        diary_entry = DiaryEntry.objects.get(id=entry_id, user=request.user)
+    except DiaryEntry.DoesNotExist:
+        return Response({'message': 'DiaryEntry not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        tag = Tag.objects.get(id=tag_id, user=request.user)
+    except Tag.DoesNotExist:
+        return Response({'message': 'Tag not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        diary_entry_tag = DiaryEntryTag.objects.get(
+            diaryentry=diary_entry,
+            tag=tag,
+            user=request.user
+        )
+        diary_entry_tag.delete()
+        return Response({'message': 'Tag removed from entry'}, status=status.HTTP_204_NO_CONTENT)
+    except DiaryEntryTag.DoesNotExist:
+        return Response({'message': 'Tag not associated with this diary entry'}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

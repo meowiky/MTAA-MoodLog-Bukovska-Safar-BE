@@ -153,3 +153,9 @@ curl --location 'http://localhost:8000/api/entries/ordered/' \
 --header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
 --header 'Content-Type: application/json'
 ```
+
+```
+curl --location --request DELETE 'http://localhost:8000/api/entries/1/remove_tag/1/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json'
+```
