@@ -82,3 +82,6 @@ class FriendsSerializer(serializers.ModelSerializer):
     def get_email(self, obj):
         return obj[1]
 
+class EmotionStatsSerializer(serializers.Serializer):
+    emotion = serializers.CharField(max_length=2)
+    count = serializers.IntegerField()

@@ -129,3 +129,21 @@ curl --location 'http://localhost:8000/api/tags/' \
 --header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
 --header 'Content-Type: application/json'
 ```
+
+```
+curl --location 'http://localhost:8000/api/tags/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json'
+```
+
+```
+curl --location 'http://localhost:8000/api/stats/emotions/monthly/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json'
+```
+
+```
+curl --location 'http://localhost:8000/api/stats/emotions/yearly/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json'
+```

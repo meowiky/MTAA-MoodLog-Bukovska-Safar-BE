@@ -5,9 +5,15 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.db.models import Count
+from dateutil.relativedelta import relativedelta
+from django.db.models.functions import TruncDay
+import calendar
 
 from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship
-from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer, TagSerializer, DiaryEntryPhotoSerializer
+from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer, TagSerializer, \
+    DiaryEntryPhotoSerializer, EmotionStatsSerializer
 from .serializers import DiaryEntrySerializer, FriendshipRequestSerializer, FriendshipModifySerializer, FriendsSerializer
 
 @api_view(['POST'])
@@ -208,5 +214,90 @@ def list_user_tags(request):
     tags = Tag.objects.filter(user=request.user).order_by('tagname')
     serializer = TagSerializer(tags, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_weekly_emotion_stats(request):
+    today = timezone.now().date()
+    a_week_ago = today - timezone.timedelta(days=7)
+
+    weekly_entries = DiaryEntry.objects.filter(
+        user=request.user,
+        date__range=[a_week_ago, today]
+    )
+
+    emotion_stats = weekly_entries.values('emotion').annotate(count=Count('emotion'))
+
+    serializer = EmotionStatsSerializer(emotion_stats, many=True)
+
+    number_of_days = weekly_entries.annotate(day=TruncDay('date')).values('day').distinct().count()
+
+    stats = {
+        'emotion_stats': serializer.data,
+        'number_of_days_with_entry': number_of_days,
+        'number_of_days': 7
+    }
+
+    return Response(stats)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_monthly_emotion_stats(request):
+    today = timezone.now().date()
+    a_month_ago = today - relativedelta(months=1)
+
+    monthly_entries = DiaryEntry.objects.filter(
+        user=request.user,
+        date__range=[a_month_ago, today]
+    )
+
+    emotion_stats = monthly_entries.annotate(day=TruncDay('date'))\
+                                   .values('day', 'emotion')\
+                                   .annotate(count=Count('emotion'))\
+                                   .order_by('day', 'emotion')
+
+    _, total_days_in_month = calendar.monthrange(today.year, today.month)
+
+    number_of_days = monthly_entries.annotate(day=TruncDay('date')).values('day').distinct().count()
+
+    serializer = EmotionStatsSerializer(emotion_stats, many=True)
+
+    stats = {
+        'emotion_stats': serializer.data,
+        'number_of_days_with_entry': number_of_days,
+        'number_of_days': total_days_in_month
+    }
+
+    return Response(stats)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_yearly_emotion_stats(request):
+    today = timezone.now().date()
+    a_year_ago = today - relativedelta(years=1)
+
+    yearly_entries = DiaryEntry.objects.filter(
+        user=request.user,
+        date__range=[a_year_ago, today]
+    )
+
+    emotion_stats = yearly_entries.annotate(day=TruncDay('date'))\
+                                  .values('day', 'emotion')\
+                                  .annotate(count=Count('emotion'))\
+                                  .order_by('day', 'emotion')
+
+    number_of_days = yearly_entries.annotate(day=TruncDay('date')).values('day').distinct().count()
+
+    serializer = EmotionStatsSerializer(emotion_stats, many=True)
+
+    total_days_in_year = 365 + calendar.isleap(today.year)
+
+    stats = {
+        'emotion_stats': serializer.data,
+        'number_of_days_with_entry': number_of_days,
+        'number_of_days': total_days_in_year
+    }
+
+    return Response(stats)
 
 
