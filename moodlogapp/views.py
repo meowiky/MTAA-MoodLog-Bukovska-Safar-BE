@@ -11,6 +11,7 @@ from django.db.models.functions import TruncDay
 import calendar
 from rest_framework.parsers import FileUploadParser
 from rest_framework.decorators import parser_classes
+from django.db import IntegrityError
 
 from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship, Message
 from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer, TagSerializer, DiaryEntryPhotoSerializer
@@ -21,11 +22,15 @@ from .serializers import SendMessageSerializer, GetMessagesSerializer, ChangeNot
 def register(request):
     serialized = UserSerializer(data=request.data)
     if serialized.is_valid():
-        user = serialized.save()
-        if user:
+        try:
+            user = serialized.save()
             return Response(serialized.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError as e:
+            if 'unique constraint' in str(e):
+                return Response({'email': ['A user with that email already exists.']}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'An unexpected error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    else:
+        return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def login(request):
