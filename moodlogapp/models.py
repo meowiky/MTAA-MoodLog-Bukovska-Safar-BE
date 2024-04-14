@@ -56,6 +56,9 @@ class Tag(models.Model):
     def __str__(self):
         return self.tagname
 
+    class Meta:
+        unique_together = ('user', 'tagname')
+
 class DiaryEntry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
