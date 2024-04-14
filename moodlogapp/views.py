@@ -155,23 +155,25 @@ def remove_tag_from_entry(request, entry_id, tag_id):
 @permission_classes([IsAuthenticated])
 def send_friend_request(request, friend_id):
     user = request.user
+    if user.pk == friend_id:
+        return Response({'error': 'You cannot send a friend request to yourself.'}, status=status.HTTP_400_BAD_REQUEST)
+
     friend = get_object_or_404(User, pk=friend_id)
-
-    if user.id > friend_id:
-        user, friend = friend, user
-
     friendship_exists = Friendship.objects.filter(
-        (Q(status='PEN') | Q(status='ACC')), user1=user, user2=friend
+        (Q(status='PEN') | Q(status='ACC')),
+        (Q(user1=user, user2=friend) | Q(user1=friend, user2=user))
     ).exists()
     if friendship_exists:
         return Response({'error': 'Friend request already sent or connection exists.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    data = {'user1': user.id, 'user2': friend.id, 'status': 'PEN'}
+    data = {'user1': user.id, 'user2': friend.id, 'status': 'PEN', 'sender': user.id}
     serializer = FriendshipRequestSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['PATCH'])

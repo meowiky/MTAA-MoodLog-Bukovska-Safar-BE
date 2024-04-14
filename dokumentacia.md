@@ -255,7 +255,7 @@ Response 401 Unauthorized:
 
 ## Create Tag `/api/tags/create/`
 
-Method: Post
+Method: Post  
 Written By: Viky
 
 Curl call:
@@ -297,6 +297,134 @@ Response 400 Bad request:
 ```json
 {
     "error": "duplicate key value violates unique constraint \"moodlogapp_tag_user_id_tagname_618d0a9a_uniq\"\nDETAIL:  Key (user_id, tagname)=(1, TagName2) already exists.\n"
+}
+```
+
+## Add tag to diary entry `/api/entries/<id>/add_tag/`
+
+Method: Post  
+Written By: Viky
+
+Curl call:
+
+```bash
+curl --location 'http://localhost:8000/api/entries/2/add_tag/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "tagname": "TagName2"
+}'
+```
+
+Response 201 Created:
+```json
+{
+    "diaryentry": 2,
+    "tag": 2
+}
+```
+Response 404 Not found:
+```json
+{
+    "message": "Tag not found"
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Remove tag from diary entry `/api/entries/<entryid>/remove_tag/<tagid>/`
+
+Method: Delete  
+Written By: Viky
+
+Curl call:
+```bash
+curl --location --request DELETE 'http://localhost:8000/api/entries/1/remove_tag/1/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json'
+```
+
+Response 204 No content:
+```json
+{
+    "message": "Tag removed from entry"
+}
+```
+
+response 404 Not found:
+```json
+{
+    "message": "Tag not found"
+}
+```
+
+Response 404 Not found:
+```json
+{
+    "message": "DiaryEntry not found"
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Send Friend request `/api/friend_requests/send/id/`
+
+Method: Post  
+Written By: Robert and Viky
+
+Curl call:
+```bash
+curl --location --request POST 'http://localhost:8000/api/friend_requests/send/5/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json'
+```
+
+Response 201 Created:
+```json
+{
+    "id": 5,
+    "status": "PEN",
+    "sender": 1,
+    "user1": 1,
+    "user2": 8
+}
+```
+
+Response 400 Bad request:
+```json
+{
+    "error": "Friend request already sent or connection exists."
+}
+```
+
+Response 404 Not found:
+```json
+{
+    "detail": "No User matches the given query."
+}
+```
+
+response 400 Bad request:
+```json
+{
+    "error": "You cannot send a friend request to yourself."
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
 }
 ```
 
