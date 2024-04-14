@@ -502,6 +502,177 @@ Response 401 Unauthorized:
 }
 ```
 
+## Get all friends `/api/friends/`
+
+Method: Get  
+Written By: Robert and Viky
+
+Curl call:
+```bash
+curl --location 'http://localhost:8000/api/friends/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 ok:
+```json
+[
+    {
+        "name": "Test User2",
+        "email": "tes2@example.com"
+    },
+    {
+        "name": "Test User4",
+        "email": "test4@example.com"
+    },
+    {
+        "name": "Test User5",
+        "email": "test5@example.com"
+    }
+]
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Change User name `/api/change_name/`
+
+Method: Patch  
+Written By: Viky
+
+Curl call:
+```bash
+curl --location --request PATCH 'http://localhost:8000/api/change_name/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "New Name user1"
+}'
+```
+
+Response 200 OK:
+```json
+{
+    "message": "Name updated successfully."
+}
+```
+
+Response 400 bad request:
+```json
+{
+    "error": "Invalid request, name is required."
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Change User email `/api/change_email/`
+
+Method: Patch  
+Written By: Viky
+
+Curl call:
+```bash
+curl --location --request PATCH 'http://localhost:8000/api/change_email/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "blab@example.com"
+}'
+```
+
+Response 200 OK:
+```json
+{
+    "message": "Email updated successfully."
+}
+```
+
+Response 400 Bad request:
+```json
+{
+    "error": "This email is already in use."
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+Response 400 Bad request:
+```json
+{
+    "error": "This email is already in use."
+}
+```
+
+Response 400 bad request:
+```json
+{
+    "error": "Invalid request, email is required."
+}
+```
+
+## Change Password `/api/change_password/`
+
+Method: Patch  
+Written By: Viky
+
+Curl call:
+```bash
+curl --location --request PATCH 'http://localhost:8000/api/change_password/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "old_password": "newpassword123",
+    "new_password": "newpassword1234"
+}'
+```
+
+Response 200 ok:
+```json
+{
+    "message": "Password updated successfully."
+}
+```
+
+Response 400 bad request:
+```json
+{
+    "error": "New password cannot be the same as the old password."
+}
+```
+
+Response 400 bad request:
+```json
+{
+    "error": "Old password is incorrect."
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+
+
+
+
 
 
 
