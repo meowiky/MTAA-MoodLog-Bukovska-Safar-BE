@@ -428,6 +428,87 @@ Response 401 Unauthorized:
 }
 ```
 
+## Accept friend request `/api/friend_requests/accept/id/`
+
+Method: Patch  
+Written By: Robert and Viky
+
+
+Curl call:
+```bash
+curl --location --request PATCH 'http://localhost:8000/api/friend_requests/accept/1/' \
+--header 'Authorization: Token 014190002278d1985544999725adec3f9d3d4517' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 OK:
+```json
+{
+    "status": "ACC"
+}
+```
+
+Response 404 Not found:
+```json
+{
+    "detail": "No Friendship matches the given query."
+}
+```
+
+Response 403 forbidden:
+```json
+{
+    "error": "You do not have permission to accept this friend request"
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Decline Friend request `/api/friend_requests/decline/id/`
+
+Method: Patch  
+Written By: Robert and Viky
+
+Curl call:
+```bash
+curl --location --request PATCH 'http://localhost:8000/api/friend_requests/decline/1/' \
+--header 'Authorization: Token 014190002278d1985544999725adec3f9d3d4517' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 Ok:
+```json
+{
+    "status": "DEC"
+}
+```
+
+Response 404 not found:
+```json
+{
+    "detail": "No Friendship matches the given query."
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+
+
+
+
+
+
+
 
 
 

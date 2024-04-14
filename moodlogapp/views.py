@@ -182,15 +182,19 @@ def accept_friend_request(request, friend_id):
     user = request.user
     friend = get_object_or_404(User, pk=friend_id)
 
-    friendship = get_object_or_404(Friendship, user2=user, user1=friend, status='PEN', sender=1)
-    if friendship:
-        serializer = FriendshipModifySerializer(friendship, data={'status': 'ACC'}, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:
+    try:
+        friendship = Friendship.objects.get(
+            user1=friend, user2=user, status='PEN', sender=friend.id
+        )
+    except Friendship.DoesNotExist:
         return Response({'error': 'You do not have permission to accept this friend request'}, status=status.HTTP_403_FORBIDDEN)
+
+    serializer = FriendshipModifySerializer(friendship, data={'status': 'ACC'}, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PATCH'])
