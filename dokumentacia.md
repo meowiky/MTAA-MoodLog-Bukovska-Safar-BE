@@ -669,6 +669,188 @@ Response 401 Unauthorized:
 }
 ```
 
+## Get all User tags `/api/tags/`
+
+Method: Get
+Written by: Viky
+
+Curl Call:
+```bash
+curl --location 'http://localhost:8000/api/tags/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 ok:
+```json
+[
+    {
+        "id": 1,
+        "tagname": "TagName"
+    },
+    {
+        "id": 2,
+        "tagname": "TagName2"
+    }
+]
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Get weekly emotion stats `/api/stats/emotions/weekly/`
+
+Method: Get
+Written by: Viky
+
+Curl Call:
+```bash
+curl --location 'http://localhost:8000/api/stats/emotions/weekly/' \
+--header 'Authorization: Token ca5a2dc59738f73dd3eacbe1a3142d6f514a2b39' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 ok:
+```json
+{
+    "emotion_stats": [
+        {
+            "emotion": "A",
+            "count": 1
+        },
+        {
+            "emotion": "H",
+            "count": 1
+        },
+        {
+            "emotion": "N",
+            "count": 1
+        },
+        {
+            "emotion": "S",
+            "count": 1
+        },
+        {
+            "emotion": "VH",
+            "count": 1
+        }
+    ],
+    "number_of_days_with_entry": 5,
+    "number_of_days": 7
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Get monthly emotion stats `/api/stats/emotions/monthly/`
+
+Method: Get
+Written by: Viky
+
+Curl Call:
+```bash
+curl --location 'http://localhost:8000/api/stats/emotions/monthly/' \
+--header 'Authorization: Token ca5a2dc59738f73dd3eacbe1a3142d6f514a2b39' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 ok:
+```json
+{
+    "emotion_stats": [
+        {
+            "emotion": "A",
+            "count": 2
+        },
+        {
+            "emotion": "H",
+            "count": 1
+        },
+        {
+            "emotion": "N",
+            "count": 1
+        },
+        {
+            "emotion": "S",
+            "count": 3
+        },
+        {
+            "emotion": "VH",
+            "count": 2
+        }
+    ],
+    "number_of_days_with_entry": 9,
+    "number_of_days": 30
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+
+## Get yearly emotion stats `/api/stats/emotions/yearly/`
+
+Method: Get
+Written by: Viky
+
+Curl Call:
+```bash
+curl --location 'http://localhost:8000/api/stats/emotions/yearly/' \
+--header 'Authorization: Token ca5a2dc59738f73dd3eacbe1a3142d6f514a2b39' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 ok:
+```json
+{
+    "emotion_stats": [
+        {
+            "emotion": "A",
+            "count": 2
+        },
+        {
+            "emotion": "H",
+            "count": 1
+        },
+        {
+            "emotion": "N",
+            "count": 1
+        },
+        {
+            "emotion": "S",
+            "count": 3
+        },
+        {
+            "emotion": "VH",
+            "count": 2
+        }
+    ],
+    "number_of_days_with_entry": 9,
+    "number_of_days": 366
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+
 
 
 

@@ -49,7 +49,6 @@ def login(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_diary_entry(request):
-    print(request.META.get('HTTP_AUTHORIZATION'))
     serializer = DiaryEntrySerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(user=request.user)
@@ -286,7 +285,9 @@ def get_weekly_emotion_stats(request):
         date__range=[a_week_ago, today]
     )
 
-    emotion_stats = weekly_entries.values('emotion').annotate(count=Count('emotion'))
+    emotion_stats = weekly_entries.values('emotion') \
+        .annotate(count=Count('id')) \
+        .order_by('emotion')
 
     serializer = EmotionStatsSerializer(emotion_stats, many=True)
 
@@ -312,10 +313,9 @@ def get_monthly_emotion_stats(request):
         date__range=[a_month_ago, today]
     )
 
-    emotion_stats = monthly_entries.annotate(day=TruncDay('date'))\
-                                   .values('day', 'emotion')\
-                                   .annotate(count=Count('emotion'))\
-                                   .order_by('day', 'emotion')
+    emotion_stats = monthly_entries.values('emotion') \
+        .annotate(count=Count('id')) \
+        .order_by('emotion')
 
     _, total_days_in_month = calendar.monthrange(today.year, today.month)
 
@@ -343,10 +343,9 @@ def get_yearly_emotion_stats(request):
         date__range=[a_year_ago, today]
     )
 
-    emotion_stats = yearly_entries.annotate(day=TruncDay('date'))\
-                                  .values('day', 'emotion')\
-                                  .annotate(count=Count('emotion'))\
-                                  .order_by('day', 'emotion')
+    emotion_stats = yearly_entries.values('emotion') \
+        .annotate(count=Count('id')) \
+        .order_by('emotion')
 
     number_of_days = yearly_entries.annotate(day=TruncDay('date')).values('day').distinct().count()
 
