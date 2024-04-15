@@ -971,13 +971,156 @@ curl --location 'http://localhost:8000/api/entries/1/add_photo/' \
 --form 'photo=@"/C:/Users/vikyb/Pictures/gosig-ratta.jpg"'
 ```
 
+## Send a Message `/api/send_message/<id>/`
 
+Method: Patch  
+Written By: Robert
 
+Curl call:
+```bash
+curl --location --request PATCH 'http://localhost:8000/api/send_message/2/' \
+--header 'Authorization: Token fa9b8410308e45b2ed0ba0f13aebcd495792cbf8' \
+--header 'Content-Type: application/json'
+```
 
+Response 201 Created:
+```json
+{
+  "id": 11,
+  "text": "toto je sprava ktoru ti posielam",
+  "sent_at": "2024-04-15T16:54:21.816618Z",
+  "read_at": null,
+  "sender": 1,
+  "receiver": 2
+}
+```
 
+Response 400 Bad Request
+```json
+{
+  "text": [
+    "This field is required."
+  ]
+}
+```
 
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
 
+## Get All Messages With a User `/api/get_messages/<id>/`
 
+Method: Patch  
+Written By: Robert
+
+Curl call:
+```bash
+curl --location --request PATCH 'http://localhost:8000/api/get_messages/2/' \
+--header 'Authorization: Token fa9b8410308e45b2ed0ba0f13aebcd495792cbf8' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 Ok:
+```json
+[
+  {
+    "text": "cavko cavko",
+    "sent_at": "2024-04-13T13:11:34.971819Z",
+    "read_at": "2024-04-13T13:42:49.723997Z",
+    "sender": 1,
+    "receiver": 5
+  },
+  {
+    "text": "ahoj",
+    "sent_at": "2024-04-13T13:15:11.121171Z",
+    "read_at": "2024-04-13T13:40:17.399384Z",
+    "sender": 5,
+    "receiver": 1
+  },
+  {
+    "text": "ako?",
+    "sent_at": "2024-04-13T13:41:42.194771Z",
+    "read_at": "2024-04-13T13:42:49.723997Z",
+    "sender": 1,
+    "receiver": 5
+  }
+]
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Delete a Message `/api/delete_message/<id>/`
+
+Method: Patch  
+Written By: Robert
+
+Curl call:
+```bash
+curl --location --request PATCH 'http://localhost:8000/api/delete_message/11/' \
+--header 'Authorization: Token fa9b8410308e45b2ed0ba0f13aebcd495792cbf8' \
+--header 'Content-Type: application/json'
+```
+
+Response 204 Not Found:
+```json
+{
+  "message": "Message deleted"
+}
+```
+
+Response 404 Not Found
+```json
+{
+  "message": "Message not found"
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+  "error": "You are not authorized to delete this message"
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Change Notifications `/api/change_notifications/`
+
+Method: Patch  
+Written By: Robert
+
+Curl call:
+```bash
+curl --location --request PATCH 'http://localhost:8000/api/change_notifications/' \
+--header 'Authorization: Token fa9b8410308e45b2ed0ba0f13aebcd495792cbf8' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 OK:
+```json
+{
+  "notification": false
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
 
 
 
