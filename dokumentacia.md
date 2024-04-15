@@ -850,8 +850,126 @@ Response 401 Unauthorized:
 }
 ```
 
+## Get all diary entries ordered `/api/entries/ordered/`
 
+Method: Get
+Written by: Viky
 
+Curl Call:
+```bash
+curl --location 'http://localhost:8000/api/entries/ordered/' \
+--header 'Authorization: Token ca5a2dc59738f73dd3eacbe1a3142d6f514a2b39' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 ok:
+```json
+[
+    {
+        "id": 17,
+        "date": "2024-04-14T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "S",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 16,
+        "date": "2024-04-13T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "A",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 15,
+        "date": "2024-04-12T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "N",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 14,
+        "date": "2024-04-11T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "H",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 13,
+        "date": "2024-04-10T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "VH",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 21,
+        "date": "2024-04-05T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "VH",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 20,
+        "date": "2024-04-04T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "A",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 19,
+        "date": "2024-04-03T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "S",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 18,
+        "date": "2024-04-01T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "S",
+        "location": "My Location",
+        "user": 9
+    }
+]
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Add photo to entry `/api/entries/id/add_photo/`
+
+Method: Post  
+Written by: Viky
+
+not working properly :((
+
+Curl call:
+```bash
+curl --location 'http://localhost:8000/api/entries/1/add_photo/' \
+--header 'Authorization: Token a05ae5b929658e5da58ff8de46abfdf714bee1d1' \
+--header 'Content-Type: multipart/form-data' \
+--form 'photo=@"/C:/Users/vikyb/Pictures/gosig-ratta.jpg"'
+```
 
 
 
