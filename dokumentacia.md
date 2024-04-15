@@ -1173,6 +1173,65 @@ Response 401 Unauthorized:
 }
 ```
 
+## Get all diary entries with tag `/api/entries/tagged/malina/`
+
+Method: Get
+Written by: Viky
+
+Curl call:
+```bash
+curl --location 'http://localhost:8000/api/entries/tagged/malina/' \
+--header 'Authorization: Token ca5a2dc59738f73dd3eacbe1a3142d6f514a2b39' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 ok:
+```json
+[
+    {
+        "id": 13,
+        "date": "2024-04-10T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "VH",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 14,
+        "date": "2024-04-11T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "H",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 15,
+        "date": "2024-04-12T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "Today was an amazing day...",
+        "emotion": "N",
+        "location": "My Location",
+        "user": 9
+    }
+]
+```
+
+Response 404 not found:
+```json
+{
+    "detail": "No Tag matches the given query."
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
 
 
 

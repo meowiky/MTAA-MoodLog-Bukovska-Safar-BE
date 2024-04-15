@@ -466,3 +466,15 @@ def search_diary_entries(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({'message': 'Keyword parameter is missing.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_entries_by_tag(request, tag_name):
+    tag = get_object_or_404(Tag, tagname=tag_name, user=request.user)
+
+    entries = DiaryEntryTag.objects.filter(tag=tag).select_related('diaryentry').values_list('diaryentry', flat=True).distinct()
+
+    diary_entries = DiaryEntry.objects.filter(id__in=entries)
+    serializer = DiaryEntrySerializer(diary_entries, many=True)
+    return Response(serializer.data)
