@@ -12,6 +12,7 @@ import calendar
 from rest_framework.parsers import FileUploadParser
 from rest_framework.decorators import parser_classes
 from django.db import IntegrityError
+from django.db.models import Q
 
 from .models import User, DiaryEntry, DiaryEntryTag, Tag, DiaryEntryPhoto, Friendship, Message
 from .serializers import UserSerializer, AuthTokenSerializer, DiaryEntryTagSerializer, TagSerializer, DiaryEntryPhotoSerializer
@@ -449,3 +450,19 @@ def add_photo_to_entry(request, entry_id):
         return Response(file_serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_diary_entries(request):
+    keyword = request.query_params.get('keyword', None)
+
+    if keyword is not None:
+        diary_entries = DiaryEntry.objects.filter(
+            Q(title__icontains=keyword) | Q(text__icontains=keyword),
+            user=request.user
+        ).order_by('-date')
+
+        serializer = DiaryEntrySerializer(diary_entries, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({'message': 'Keyword parameter is missing.'}, status=status.HTTP_400_BAD_REQUEST)
