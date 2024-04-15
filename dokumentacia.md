@@ -1048,6 +1048,7 @@ Response 200 Ok:
     "receiver": 5
   }
 ]
+```
 
 Response 401 Unauthorized:
 ```json
@@ -1112,6 +1113,56 @@ Response 200 OK:
 ```json
 {
   "notification": false
+}
+```
+
+Response 401 Unauthorized:
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+## Search with keyword `/api/entries/search/?keyword=jahoda`
+
+Method: Get  
+Written by: Viky
+
+Curl call:
+```bash
+curl --location 'http://localhost:8000/api/entries/search/?keyword=jahoda' \
+--header 'Authorization: Token ca5a2dc59738f73dd3eacbe1a3142d6f514a2b39' \
+--header 'Content-Type: application/json'
+```
+
+Response 200 OK:
+```json
+[
+    {
+        "id": 16,
+        "date": "2024-04-13T14:58:27.600700Z",
+        "title": "mnam jahoda",
+        "text": "Today was an amazing day...",
+        "emotion": "A",
+        "location": "My Location",
+        "user": 9
+    },
+    {
+        "id": 20,
+        "date": "2024-04-04T14:58:27.600700Z",
+        "title": "My Diary Entry",
+        "text": "jahoda je super",
+        "emotion": "A",
+        "location": "My Location",
+        "user": 9
+    }
+]
+```
+
+Response 400 bad request:
+```json
+{
+    "message": "Keyword parameter is missing."
 }
 ```
 
